@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Button, TouchableWithoutFeedback, Keyboard, Ale
 import Card from '../components/Card';
 import colors from '../constants/colors';
 import Input from '../components/Input';
+import NumberContainer from '../components/NumberContainer';
 
 
 const StartGameScreen = (props) => {
@@ -24,19 +25,25 @@ const StartGameScreen = (props) => {
             Alert.alert(
                 'Inavalid Number!',
                 'Number has to be a number between 1 and 99.',
-                [{ text: 'okay', style:'destructive', onPress: resetInputHandler }])
+                [{ text: 'okay', style: 'destructive', onPress: resetInputHandler }])
             return;
         }
         setConfirmed(true);
         setSelectedNumber(chosenNumber);
         setEnteredValue('');
+        Keyboard.dismiss();
 
     }
 
     let confirmedOutput;
 
     if (confirmed) {
-        confirmedOutput = <Text>Choosen Number: {selectedNumber}</Text>
+        confirmedOutput =
+            <Card style={styles.confirmOutput}>
+                <Text>You Selected</Text>
+                <NumberContainer>{selectedNumber}</NumberContainer>
+                <Button title="START GAME"/>
+            </Card>
     }
     return (
         <TouchableWithoutFeedback onPress={() => {
@@ -105,6 +112,10 @@ const styles = StyleSheet.create({
     input: {
         width: 50,
         textAlign: 'center'
+    },
+    confirmOutput: {
+        marginTop: 20,
+        alignItems:'center'
     }
 });
 
