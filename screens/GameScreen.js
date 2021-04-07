@@ -2,6 +2,7 @@ import React, {useState, useRef, useEffect} from 'react';
 import { View, Text, StyleSheet, Button, Alert } from 'react-native';
 import NumberContainer from '../components/NumberContainer';
 import Card from '../components/Card';
+import DefaultStyles from '../constants/default-styles';
 
 //Genrate Random func using Recursion
 const genrateRandomBetween = (min,max,exclude) => {
@@ -48,7 +49,7 @@ const GameScreen = (props) => {
     }
     return (
         <View style={styles.screen}>
-            <Text>Opponent's Guess</Text>
+            <Text style={DefaultStyles.title}>Opponent's Guess</Text>
             <NumberContainer>
                 {currentGuess}
             </NumberContainer>
