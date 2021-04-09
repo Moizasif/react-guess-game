@@ -1,53 +1,56 @@
-import React, {useState, useRef, useEffect} from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
-import  {Ionicons} from '@expo/vector-icons';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import NumberContainer from '../components/NumberContainer';
 import Card from '../components/Card';
 import MainButton from '../components/MainButton';
 import DefaultStyles from '../constants/default-styles';
 
 //Genrate Random func using Recursion
-const genrateRandomBetween = (min,max,exclude) => {
-     min = Math.ceil(min);
-     max = Math.floor(max);
-     const rndNum = Math.floor(Math.random() * (max - min)) + min;
+const genrateRandomBetween = (min, max, exclude) => {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    const rndNum = Math.floor(Math.random() * (max - min)) + min;
 
-     if(rndNum === exclude) {
-         return genrateRandomBetween(min, max , exclude);
-     } else {
-         return rndNum;
-     }
+    if (rndNum === exclude) {
+        return genrateRandomBetween(min, max, exclude);
+    } else {
+        return rndNum;
+    }
 }
 
 const GameScreen = (props) => {
-    const [currentGuess, setCurrentGuess] = useState(genrateRandomBetween(1, 100, props.userChoice));
-    const [rounds, setRounds] = useState(0);
+    const initialGuess = genrateRandomBetween(1, 100, props.userChoice);
+
+    const [currentGuess, setCurrentGuess] = useState(initialGuess);
+    const [pastGuesses, setPastGuesses] = useState([initialGuess]);
     const currentLow = useRef(1);
     const currentHigh = useRef(100);
 
-    const {userChoice, onGameOver} = props;
+    const { userChoice, onGameOver } = props;
 
     useEffect(() => {
-         if(currentGuess === props.userChoice) {
-             onGameOver(rounds);
-         }
+        if (currentGuess === props.userChoice) {
+            onGameOver(pastGuesses.length);
+        }
     }, [currentGuess, userChoice, onGameOver]);
 
     const nextGuessHandler = direction => {
-        if ((direction === 'lower' && currentGuess < props.userChoice) || (direction === 'greater' && currentGuess > props.userChoice)){
+        if ((direction === 'lower' && currentGuess < props.userChoice) || (direction === 'greater' && currentGuess > props.userChoice)) {
             Alert.alert('Don\'t lie!', 'You know that this is wrong...', [
-                {text: 'Sorry' , style: 'cancel'}
+                { text: 'Sorry', style: 'cancel' }
             ]);
             return;
         }
-        if(direction === 'lower'){
+        if (direction === 'lower') {
             currentHigh.current = currentGuess;
-        }else {
-            currentLow.current = currentGuess;
+        } else {
+            currentLow.current = currentGuess + 1;
         }
         const nextNumber = genrateRandomBetween(currentLow.current, currentHigh.current, currentGuess);
         setCurrentGuess(nextNumber);
-        setRounds(curRounds => curRounds + 1);
+        // setRounds(curRounds => curRounds + 1);
+        setPastGuesses(curPastGuesses => [nextNumber, ...curPastGuesses]);
     }
     return (
         <View style={styles.screen}>
@@ -57,31 +60,38 @@ const GameScreen = (props) => {
             </NumberContainer>
             <Card style={styles.buttonContainer}>
                 <MainButton onPress={nextGuessHandler.bind(this, 'lower')}>
-                    <Ionicons name="md-remove" size= {24} color="white"/>
+                    <Ionicons name="md-remove" size={24} color="white" />
                 </MainButton>
                 <MainButton onPress={nextGuessHandler.bind(this, 'greater')}>
-                <Ionicons name="md-add" size= {24} color="white"/>
-                </MainButton>  
+                    <Ionicons name="md-add" size={24} color="white" />
+                </MainButton>
             </Card>
+
+            <ScrollView>
+                {pastGuesses.map(guess =>
+                    <View key={guess}>
+                        <Text>{guess}</Text>
+                    </View>)}
+            </ScrollView>
 
         </View>
     )
 }
 
 const styles = StyleSheet.create({
-   screen: {
-       flex: 1,
-       padding: 10,
-       alignItems: 'center'
-   },
-   buttonContainer: {
-       flexDirection: 'row',
-       justifyContent: 'space-around',
-       marginTop: 20,
-       width: 400,
-       maxWidth: '90%'
+    screen: {
+        flex: 1,
+        padding: 10,
+        alignItems: 'center'
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginTop: 20,
+        width: 400,
+        maxWidth: '90%'
 
-   }
+    }
 });
 
 export default GameScreen
